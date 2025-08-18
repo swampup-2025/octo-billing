@@ -1,9 +1,9 @@
 name: Build and Push to Artifactory
 
 on:
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 env:
@@ -52,5 +52,5 @@ jobs:
     - name: Generate provenance attestation
       uses: actions/attest-build-provenance@v2
       with:
-        subject-name: octo-billing
+        subject-name: ${{ env.JF_DOCKER_REPO }}/${{ env.IMAGE_NAME }}/${{ github.run_number }}/manifest.json
         subject-digest: ${{ steps.build.outputs.digest }}
