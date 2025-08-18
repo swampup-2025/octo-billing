@@ -41,7 +41,6 @@ jobs:
         password: ${{ steps.jfrog-setup.outputs.oidc-token }}
 
     - name: Build and Push to Artifactory
-      if: false
       id: build
       uses: docker/build-push-action@v4
       with:
