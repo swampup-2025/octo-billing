@@ -6,10 +6,6 @@ on:
   #    - main
   workflow_dispatch:
 
-env:
-  ARTIFACTORY_REGISTRY: tbd
-  IMAGE_NAME: octo-billing
-
 jobs:
   build:
     runs-on: ubuntu-latest
