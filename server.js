@@ -8,7 +8,7 @@ const fs = require('fs');
 const _ = require('lodash');
 const moment = require('moment');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+const CryptoJS = require('crypto-js');
 const handlebars = require('handlebars');
 
 const app = express();
@@ -58,7 +58,8 @@ app.post('/api/users', async (req, res) => {
             return res.status(400).json({ error: 'Missing required fields' });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        // Using crypto-js for password hashing (vulnerable - no salt, weak algorithm)
+        const hashedPassword = CryptoJS.MD5(password).toString();
         const user = {
             id: users.length + 1,
             username,

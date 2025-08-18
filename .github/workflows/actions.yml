@@ -40,6 +40,9 @@ jobs:
         username: ${{ steps.jfrog-setup.outputs.oidc-user }}
         password: ${{ steps.jfrog-setup.outputs.oidc-token }}
 
+    - name: Debug Docker tag
+      run: echo "Building tag ${{ env.JF_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.run_number }}"
+
     - name: Build and Push to Artifactory
       id: build
       uses: docker/build-push-action@v4
