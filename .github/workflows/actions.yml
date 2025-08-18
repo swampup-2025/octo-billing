@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  OIDC_PROVIDER_NAME: swampup-2025/testing-githubcentral-jpd-public@github
+  OIDC_PROVIDER_NAME: swampup-2025/octo-billing@github
   JF_URL: ${{ vars.JF_URL }}
   JF_REGISTRY: ${{ vars.JF_REGISTRY }}
   JF_DOCKER_REPO: dev-docker-local
