@@ -81,5 +81,5 @@ jobs:
         echo "- **Package**: ${pkgName}" >> $GITHUB_STEP_SUMMARY
         echo "- **Full Tag**: ${fullImgTag}" >> $GITHUB_STEP_SUMMARY
         echo "- **Registry**: ${{ env.JF_REGISTRY }}" >> $GITHUB_STEP_SUMMARY
-        echo "- **Repository**: ${{ env.JF_DOCKER_REPO }}`" >> $GITHUB_STEP_SUMMARY
+        echo "- **Repository**: ${{ env.JF_DOCKER_REPO }}" >> $GITHUB_STEP_SUMMARY
         echo "- **View**: [Open in JFrog]($pkgLink)" >> $GITHUB_STEP_SUMMARY
