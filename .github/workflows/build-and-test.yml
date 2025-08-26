@@ -64,13 +64,27 @@ jobs:
         subject-name: oci://${{ env.JF_REGISTRY }}/${{ env.IMAGE_NAME }}
         subject-digest: ${{ steps.build-and-push.outputs.digest }}
 
-    # - name: Attest integration tests report
-    #   uses: actions/attest@v2
-    #   with:
-    #     subject-name: oci://${{ env.JF_REGISTRY }}/${{ env.IMAGE_NAME }}
-    #     subject-digest: ${{ steps.build-and-push.outputs.digest }}
-    #     predicate-type: 'https://jfrog.com/security/attestation/itests-report/v1'
-    #     predicate: 'itests-report.json'
+    - name: Setup Node.js 16
+      uses: actions/setup-node@v4
+      with:
+        node-version: 16
+
+    - name: Install dependencies
+      run: npm ci || npm i
+
+    - name: Build Docker image for itests
+      run: docker build -t octo-billing:${{ github.run_number }} .
+
+    - name: Run integration tests (JSON)
+      run: npm run test:it:json        
+   
+    - name: Attest integration tests report
+      uses: actions/attest@v2
+      with:
+        subject-name: oci://${{ env.JF_REGISTRY }}/${{ env.IMAGE_NAME }}
+        subject-digest: ${{ steps.build-and-push.outputs.digest }}
+        predicate-type: 'https://jfrog.com/security/attestation/itests-report/v1'
+        predicate: 'coverage/integration/itest-report.json'
 
     - name: Build Summary
       run: |
