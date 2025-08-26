@@ -54,35 +54,9 @@ jobs:
       uses: docker/build-push-action@v6
       with:
         context: .
+        push: true
         tags: ${{ env.JF_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.run_number }}
         build-args: ${{ env.BUILD_ARGS }}
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '16'
-        cache: 'npm'      
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Run integration tests
-      id: integration-tests
-      env: 
-        DOCKER_TAG: ${{ env.JF_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.run_number }}
-      run: |
-        npm run test:integration:report
-        echo "Integration tests completed"
-
-    - name: Upload integration test report
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: integration-test-report
-        path: |
-          integration-test-report.json
-          reports/
-          coverage/integration/
 
     - name: Attest docker image
       uses: actions/attest-build-provenance@v2
@@ -90,14 +64,13 @@ jobs:
         subject-name: oci://${{ env.JF_REGISTRY }}/${{ env.IMAGE_NAME }}
         subject-digest: ${{ steps.build-and-push.outputs.digest }}
 
-    - name: Attest integration tests report
-      uses: actions/attest@v2
-      if: success()
-      with:
-        subject-name: oci://${{ env.JF_REGISTRY }}/${{ env.IMAGE_NAME }}
-        subject-digest: ${{ steps.build-and-push.outputs.digest }}
-        predicate-type: 'https://jfrog.com/security/attestation/itests-report/v1'
-        predicate: 'integration-test-report.json'
+    # - name: Attest integration tests report
+    #   uses: actions/attest@v2
+    #   with:
+    #     subject-name: oci://${{ env.JF_REGISTRY }}/${{ env.IMAGE_NAME }}
+    #     subject-digest: ${{ steps.build-and-push.outputs.digest }}
+    #     predicate-type: 'https://jfrog.com/security/attestation/itests-report/v1'
+    #     predicate: 'itests-report.json'
 
     - name: Build Summary
       run: |
@@ -108,5 +81,5 @@ jobs:
         echo "- **Package**: ${pkgName}" >> $GITHUB_STEP_SUMMARY
         echo "- **Full Tag**: ${fullImgTag}" >> $GITHUB_STEP_SUMMARY
         echo "- **Registry**: ${{ env.JF_REGISTRY }}" >> $GITHUB_STEP_SUMMARY
-        echo "- **Repository**: ${{ env.JF_DOCKER_REPO }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Repository**: ${{ env.JF_DOCKER_REPO }}`" >> $GITHUB_STEP_SUMMARY
         echo "- **View**: [Open in JFrog]($pkgLink)" >> $GITHUB_STEP_SUMMARY

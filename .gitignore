@@ -98,12 +98,3 @@ Thumbs.db
 # Logs
 logs
 *.log
-
-# Test artifacts
-integration-test-report.json
-reports/
-coverage/integration/
-*.xml
-
-# Docker test images
-octo-billing:test
