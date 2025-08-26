@@ -41,6 +41,8 @@ This application includes multiple known vulnerabilities through outdated depend
 - Docker containerization
 - GitHub Actions CI/CD pipeline with security scanning
 - Jest testing framework
+- **Integration tests with Testcontainers** - Comprehensive API testing in Docker containers
+- **JSON test reporting** - Detailed test results and coverage reports
 
 ## API Endpoints
 
@@ -64,6 +66,15 @@ npm run dev
 
 # Run tests
 npm test
+
+# Run integration tests (requires Docker)
+npm run test:integration
+
+# Run integration tests with JSON report
+npm run test:integration:report
+
+# Or use the convenience script
+./scripts/run-integration-tests.sh
 ```
 
 ### Docker
@@ -113,6 +124,37 @@ To fix the vulnerabilities, you would typically:
 2. **Use Audit Tools**: Run `npm audit --fix` to automatically fix known issues
 3. **Update Base Images**: Use newer, patched container base images
 4. **Implement Security Policies**: Use tools like Renovate or Dependabot for automated updates
+
+## Testing
+
+### Unit Tests
+```bash
+npm test
+```
+
+### Integration Tests
+The application includes comprehensive integration tests that run against a Docker container:
+
+```bash
+# Run integration tests
+npm run test:integration
+
+# Run with JSON report
+npm run test:integration:report
+
+# Use convenience script
+./scripts/run-integration-tests.sh
+```
+
+The integration tests cover:
+- ✅ Health check API
+- ✅ User management API
+- ✅ Billing API
+- ✅ Payment API
+- ✅ Web interface
+- ✅ Error handling
+
+See [tests/integration/README.md](tests/integration/README.md) for detailed documentation.
 
 ## Contributing
 
