@@ -18,6 +18,7 @@ env:
   JF_URL: ${{ vars.JF_URL }}
   JF_REGISTRY: ${{ vars.JF_REGISTRY }}
   JF_DOCKER_REPO: dev-docker-local
+  JF_PROD_DOCKER_REPO: prod-docker-local
 
 jobs:
   promote-to-production:
@@ -44,8 +45,20 @@ jobs:
 
       - name: Verify Provenance
         run: |
-          jf evd verify --package-repo-name ${{ env.JF_DOCKER_REPO }} --package-name ${{ github.event.inputs.image-name }} --package-version ${{ github.event.inputs.image-version }}
-          
+          echo "## Attestation Verification" >> $GITHUB_STEP_SUMMARY
+          echo "Verifying provenance and test results..." >> $GITHUB_STEP_SUMMARY
+          jf evd verify --package-repo-name ${{ env.JF_DOCKER_REPO }} \
+          --package-name ${{ github.event.inputs.image-name }} \
+          --package-version ${{ github.event.inputs.image-version }} \
+          --package-type docker \
+          --package-sub-type docker-image \
+          --package-digest ${{ github.event.inputs.image-digest }} >> $GITHUB_STEP_SUMMARY
+
+      - name: Promote Docker Image to Production Repository
+        run: |
+          echo "## Docker Image Promotion" >> $GITHUB_STEP_SUMMARY
+          echo "Promoting Docker image to production repository..." >> $GITHUB_STEP_SUMMARY
+          jf rt docker-promote  ${{ github.event.inputs.image-name }}/${{ github.event.inputs.image-version }} ${{ env.JF_DOCKER_REPO }} ${{ env.JF_PROD_DOCKER_REPO }} >> $GITHUB_STEP_SUMMARY
 
       # - name: Security Validation
       #   run: |
