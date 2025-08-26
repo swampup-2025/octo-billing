@@ -74,7 +74,7 @@ jobs:
 
     - name: Run integration tests (JSON)
       env:
-        IMAGE_NAME: octo-billing:${{ github.run_number }}
+        IMAGE_NAME: ${{ env.JF_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.run_number }}
       run: npm run test:it:json
    
     - name: Attest integration tests report
