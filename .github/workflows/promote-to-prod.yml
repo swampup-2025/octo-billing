@@ -49,8 +49,7 @@ jobs:
           echo "Verifying provenance and test results..." >> $GITHUB_STEP_SUMMARY
           jf evd verify --package-repo-name ${{ env.JF_DOCKER_REPO }} \
           --package-name ${{ github.event.inputs.image-name }} \
-          --package-version ${{ github.event.inputs.image-version }} \
-          --package-digest ${{ github.event.inputs.image-digest }} >> $GITHUB_STEP_SUMMARY
+          --package-version ${{ github.event.inputs.image-version }} >> $GITHUB_STEP_SUMMARY
 
       - name: Promote Docker Image to Production Repository
         run: |
