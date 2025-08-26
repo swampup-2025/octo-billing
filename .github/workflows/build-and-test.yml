@@ -76,10 +76,10 @@ jobs:
       run: |
         PACKAGE_NAME='${{ env.IMAGE_NAME }}/${{ github.run_number }}'
         FULL_IMAGE_TAG='${{ env.JF_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.run_number }}'
-        PACKAGE_LINK='${{ env.JF_URL }}/ui/packages/docker:%2F%2F${{ env.JF_DOCKER_REPO }}%2F${PACKAGE_NAME}'
+        PACKAGE_LINK='${{ env.JF_URL }}/ui/packages/docker:%2F%2F${{ PACKAGE_NAME }}'
         echo '## 🐳 Docker Package Created' >> $GITHUB_STEP_SUMMARY
-        echo '- **Package**: `${PACKAGE_NAME}`' >> $GITHUB_STEP_SUMMARY
-        echo '- **Full Tag**: `${FULL_IMAGE_TAG}`' >> $GITHUB_STEP_SUMMARY
+        echo '- **Package**: `${{ PACKAGE_NAME }}`' >> $GITHUB_STEP_SUMMARY
+        echo '- **Full Tag**: `${{ FULL_IMAGE_TAG }}`' >> $GITHUB_STEP_SUMMARY
         echo '- **Registry**: `${{ env.JF_REGISTRY }}`' >> $GITHUB_STEP_SUMMARY
         echo '- **Repository**: `${{ env.JF_DOCKER_REPO }}`' >> $GITHUB_STEP_SUMMARY
-        echo "- **View**: [Open in JFrog](${PACKAGE_LINK})" >> $GITHUB_STEP_SUMMARY
+        echo "- **View**: [Open in JFrog](${{ PACKAGE_LINK }})" >> $GITHUB_STEP_SUMMARY
