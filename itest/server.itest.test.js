@@ -12,7 +12,7 @@ describe('Octo Billing integration (Docker + Testcontainers)', () => {
 
   beforeAll(async () => {
     // Use the image built ahead of time in CI/local
-    const imageTag = 'octo-billing:itest';
+    const imageTag = process.env.IMAGE_NAME || 'octo-billing:itest';
 
     container = await new GenericContainer(imageTag)
       .withExposedPorts(3000)
