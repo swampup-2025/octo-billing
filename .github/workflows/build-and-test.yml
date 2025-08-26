@@ -71,3 +71,9 @@ jobs:
     #     subject-digest: ${{ steps.build-and-push.outputs.digest }}
     #     predicate-type: 'https://jfrog.com/security/attestation/itests-report/v1'
     #     predicate: 'itests-report.json'
+
+    - name: Build Summary
+      run: |
+        PACKAGE_NAME='${{ env.IMAGE_NAME }}/${{ github.run_number }}'
+        PACKAGE_LINK='${{ env.JF_URL }}/ui/packages/docker:%2F%2F${PACKAGE_NAME}'
+        echo 'Package ['${PACKAGE_NAME}']('${PACKAGE_LINK}') created' >> $GITHUB_STEP_SUMMARY
