@@ -21,7 +21,12 @@ env:
 
 jobs:
   promote-to-production:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+    permissions:
+        contents: read
+        packages: write
+        attestations: write  # Required for attestation
+        id-token: write      # Added for OIDC token access
     
     steps:
       - name: Checkout code
