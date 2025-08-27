@@ -1,6 +1,5 @@
 ### HOW TO: Run the GitHub Workflows for octo-billing
 
-Author: yevdoa
 
 ---
 
