@@ -48,8 +48,9 @@ jobs:
           echo "## Attestation Verification" >> $GITHUB_STEP_SUMMARY
           echo "Verifying provenance and test results for ${{ github.event.inputs.image-name }}:${{ github.event.inputs.image-version }}..." >> $GITHUB_STEP_SUMMARY
           jf evd verify --package-repo-name ${{ env.JF_DOCKER_REPO }} \
-          --package-name ${{ github.event.inputs.image-name }} \
-          --package-version ${{ github.event.inputs.image-version }} >> $GITHUB_STEP_SUMMARY
+            --package-name ${{ github.event.inputs.image-name }} \
+            --package-version ${{ github.event.inputs.image-version }} \
+            --format markdown >> $GITHUB_STEP_SUMMARY
           echo "✅ Provenance and test results verification completed" >> $GITHUB_STEP_SUMMARY
 
       - name: Promote Docker Image to Production Repository
