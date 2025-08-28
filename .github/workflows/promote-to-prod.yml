@@ -70,6 +70,6 @@ jobs:
           echo "| Artifact (or package) | Source Repository | Target Repository |" >> $GITHUB_STEP_SUMMARY
           echo "| --- | --- | --- |" >> $GITHUB_STEP_SUMMARY
           LINK="${{ env.JF_URL }}/ui/repos/tree/General/${{ github.event.inputs.target-repo }}/v2/${{ github.event.inputs.image-name }}/manifests/${{ github.event.inputs.image-version }}"
-          echo "| ${{ github.event.inputs.image-name }}:${{ github.event.inputs.image-version }} | ${{ env.JF_DOCKER_REPO }} | [Open](${LINK}) |" >> $GITHUB_STEP_SUMMARY
+          echo "| ${{ github.event.inputs.image-name }}:${{ github.event.inputs.image-version }} | ${{ env.JF_DOCKER_REPO }} | [${{ github.event.inputs.target-repo }}](${LINK}) |" >> $GITHUB_STEP_SUMMARY
           
         
