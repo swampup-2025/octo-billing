@@ -45,17 +45,15 @@ jobs:
 
       - name: Verify Provenance and Test Results
         run: |
-          echo "## Attestation Verification" >> $GITHUB_STEP_SUMMARY
-          echo "Verifying provenance and test results for ${{ vars.JF_URL }}/ui/packages/docker:%2F%2F${{ github.event.inputs.image-name }}/${{ github.event.inputs.image-version }}..." >> $GITHUB_STEP_SUMMARY
+          echo "# Evidence Verification & Promotion to Prod" >> $GITHUB_STEP_SUMMARY
           jf evd verify --package-repo-name ${{ env.JF_DOCKER_REPO }} \
             --package-name ${{ github.event.inputs.image-name }} \
             --package-version ${{ github.event.inputs.image-version }} \
             --format markdown >> $GITHUB_STEP_SUMMARY            
-          echo "✅ Provenance and test results verification completed" >> $GITHUB_STEP_SUMMARY
 
       - name: Promote Docker Image to Production Repository
         run: |
-          echo "## Docker Image Promotion" >> $GITHUB_STEP_SUMMARY
-          echo "Promoting Docker image to production repository..." >> $GITHUB_STEP_SUMMARY
+          echo "## Promotion Result" >> $GITHUB_STEP_SUMMARY
           jf rt docker-promote  ${{ github.event.inputs.image-name }}/${{ github.event.inputs.image-version }} ${{ env.JF_DOCKER_REPO }} ${{ env.JF_PROD_DOCKER_REPO }} >> $GITHUB_STEP_SUMMARY
+          
         
