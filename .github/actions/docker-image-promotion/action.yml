@@ -39,7 +39,7 @@ runs:
 
         add_cp_entry() {
           local pattern="$1" target="$2"
-          jq --arg p "$pattern" --arg t "$target" '.files += [{"pattern":$p,"target":$t,"flat":true}]' -c "$SPEC_FILE" > "${SPEC_FILE}.tmp" && mv "${SPEC_FILE}.tmp" "$SPEC_FILE"
+          jq --arg p "$pattern" --arg t "$target" '.files += [{"pattern":$p,"target":$t,"flat":"true"}]' -c "$SPEC_FILE" > "${SPEC_FILE}.tmp" && mv "${SPEC_FILE}.tmp" "$SPEC_FILE"
         }
 
         # Always copy the tag reference itself
