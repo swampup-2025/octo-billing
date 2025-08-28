@@ -3,6 +3,11 @@ name: Promote Release to Production
 on:
   workflow_dispatch:
     inputs:
+      target-repo:
+        description: 'Target Docker repository'
+        default: 'prod-docker-local'
+        required: true
+        type: string      
       image-name:
         description: 'Image name to promote'
         default: 'octo-billing'
@@ -18,7 +23,6 @@ env:
   JF_URL: ${{ vars.JF_URL }}
   JF_REGISTRY: ${{ vars.JF_REGISTRY }}
   JF_DOCKER_REPO: dev-docker-local
-  JF_PROD_DOCKER_REPO: prod-docker-local
 
 jobs:
   promote-to-production:
@@ -52,8 +56,20 @@ jobs:
             --format markdown >> $GITHUB_STEP_SUMMARY            
 
       - name: Promote Docker Image to Production Repository
+        uses: ./.github/actions/docker-image-promotion
+        with:
+          src-repo: ${{ env.JF_DOCKER_REPO }}
+          dst-repo: ${{ github.event.inputs.target-repo }}
+          image: ${{ github.event.inputs.image-name }}
+          tag: ${{ github.event.inputs.image-version }}
+
+      - name: Write Promotion Summary
         run: |
           echo "## Promotion Result" >> $GITHUB_STEP_SUMMARY
-          jf rt docker-promote  ${{ github.event.inputs.image-name }}/${{ github.event.inputs.image-version }} ${{ env.JF_DOCKER_REPO }} ${{ env.JF_PROD_DOCKER_REPO }} >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Artifact (or package) | Source Repository | Target Repository |" >> $GITHUB_STEP_SUMMARY
+          echo "| --- | --- | --- |" >> $GITHUB_STEP_SUMMARY
+          LINK="${{ env.JF_URL }}/ui/repos/tree/General/${{ github.event.inputs.target-repo }}/v2/${{ github.event.inputs.image-name }}/manifests/${{ github.event.inputs.image-version }}"
+          echo "| ${{ github.event.inputs.image-name }}:${{ github.event.inputs.image-version }} | ${{ env.JF_DOCKER_REPO }} | [Open](${LINK}) |" >> $GITHUB_STEP_SUMMARY
           
         

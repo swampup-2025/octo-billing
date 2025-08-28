@@ -1,0 +1,110 @@
+name: "Docker Image Promotion"
+description: "Copies a Docker image (manifest + blobs) between Artifactory repos using jf rt cp"
+author: "yevdoa"
+runs:
+  using: "composite"
+  steps:
+    - name: Ensure jq is installed
+      shell: bash
+      run: |
+        if ! command -v jq >/dev/null 2>&1; then
+          echo "jq not found; attempting to install..."
+          if command -v apt-get >/dev/null 2>&1; then
+            sudo apt-get update -y && sudo apt-get install -y jq
+          elif command -v brew >/dev/null 2>&1; then
+            brew install jq
+          else
+            echo "jq is required. Please ensure jq is installed on the runner." >&2
+            exit 1
+          fi
+        fi
+
+    - name: Copy Docker image with jf rt cp
+      id: docker-cp
+      shell: bash
+      env:
+        SRC_REPO: ${{ inputs.src-repo }}
+        DST_REPO: ${{ inputs.dst-repo }}
+        IMAGE: ${{ inputs.image }}
+        TAG: ${{ inputs.tag }}
+      run: |
+        set -euo pipefail
+
+        ACCEPT_LIST="application/vnd.docker.distribution.manifest.list.v2+json"
+        ACCEPT_MAN="application/vnd.docker.distribution.manifest.v2+json"
+        ACCEPT_LIST_OCI="application/vnd.oci.image.index.v1+json"
+        ACCEPT_MAN_OCI="application/vnd.oci.image.manifest.v1+json"
+        SPEC_FILE="$(mktemp)"
+        echo '{"files":[]}' > "$SPEC_FILE"
+
+        add_cp_entry() {
+          local pattern="$1" target="$2"
+          jq --arg p "$pattern" --arg t "$target" '.files += [{"pattern":$p,"target":$t,"flat":true}]' -c "$SPEC_FILE" > "${SPEC_FILE}.tmp" && mv "${SPEC_FILE}.tmp" "$SPEC_FILE"
+        }
+
+        # Always copy the tag reference itself
+        add_cp_entry "${SRC_REPO}/v2/${IMAGE}/manifests/${TAG}" "${DST_REPO}/v2/${IMAGE}/manifests/"
+
+        copy_manifest_and_blobs() {
+          local manifest_json="$1"
+          local digest_ref="${2:-}"
+          if [ -n "$digest_ref" ]; then
+            add_cp_entry "${SRC_REPO}/v2/${IMAGE}/manifests/${digest_ref}" "${DST_REPO}/v2/${IMAGE}/manifests/"
+          fi
+          echo "$manifest_json" | jq -r '.config.digest, .layers[].digest' | while read -r dg; do
+            [ -z "$dg" ] && continue
+            nd="${dg#sha256:}"
+            add_cp_entry "${SRC_REPO}/v2/${IMAGE}/blobs/sha256/${nd}/data" "${DST_REPO}/v2/${IMAGE}/blobs/sha256/${nd}/"
+          done
+        }
+
+        echo "Fetching manifest for ${IMAGE}:${TAG} from ${SRC_REPO}"
+        M="$(jf rt curl -H "Accept: ${ACCEPT_LIST}, ${ACCEPT_MAN}, ${ACCEPT_LIST_OCI}, ${ACCEPT_MAN_OCI}" "/api/docker/${SRC_REPO}/v2/${IMAGE}/manifests/${TAG}")"
+        MT="$(echo "$M" | jq -r '.mediaType // empty')"
+
+        if [ "$MT" = "$ACCEPT_LIST" ] || [ "$MT" = "$ACCEPT_LIST_OCI" ]; then
+          echo "Multi-arch manifest list detected"
+          # Copy the manifest-list by digest too (resolve from headers)
+          HDRS="$(jf rt curl -I -H "Accept: ${ACCEPT_LIST}, ${ACCEPT_LIST_OCI}" "/api/docker/${SRC_REPO}/v2/${IMAGE}/manifests/${TAG}")"
+          LIST_DIGEST="$(echo "$HDRS" | tr -d '\r' | grep -i '^Docker-Content-Digest:' | head -n1 | awk '{print $2}')"
+          LIST_DIGEST="${LIST_DIGEST%%$'\r'}"
+          if [ -n "$LIST_DIGEST" ]; then
+            add_cp_entry "${SRC_REPO}/v2/${IMAGE}/manifests/${LIST_DIGEST}" "${DST_REPO}/v2/${IMAGE}/manifests/"
+          fi
+          echo "$M" | jq -r '.manifests[].digest' | while read -r pd; do
+            [ -z "$pd" ] && continue
+            PM="$(jf rt curl -H "Accept: ${ACCEPT_MAN}, ${ACCEPT_MAN_OCI}" "/api/docker/${SRC_REPO}/v2/${IMAGE}/manifests/${pd}")"
+            copy_manifest_and_blobs "$PM" "$pd"
+          done
+        else
+          echo "Single-arch manifest detected"
+          copy_manifest_and_blobs "$M"
+        fi
+
+        echo "Running jf rt cp with generated spec"
+        jf rt cp --spec "$SPEC_FILE"
+
+        echo "image=${IMAGE}" >> $GITHUB_OUTPUT
+        echo "tag=${TAG}" >> $GITHUB_OUTPUT
+
+inputs:
+  src-repo:
+    description: "Source Docker repo in Artifactory"
+    required: true
+  dst-repo:
+    description: "Destination Docker repo in Artifactory"
+    required: true
+  image:
+    description: "Docker image name (e.g., org/app)"
+    required: true
+  tag:
+    description: "Docker image tag"
+    required: true
+outputs:
+  image:
+    description: "Docker image name"
+    value: ${{ steps.docker-cp.outputs.image }}
+  tag:
+    description: "Docker image tag"
+    value: ${{ steps.docker-cp.outputs.tag }}
+
