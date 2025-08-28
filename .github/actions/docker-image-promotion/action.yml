@@ -64,13 +64,6 @@ runs:
 
         if [ "$MT" = "$ACCEPT_LIST" ] || [ "$MT" = "$ACCEPT_LIST_OCI" ]; then
           echo "Multi-arch manifest list detected"
-          # Copy the manifest-list by digest too (resolve from headers)
-          HDRS="$(jf rt curl -I -H "Accept: ${ACCEPT_LIST}, ${ACCEPT_LIST_OCI}" "/api/docker/${SRC_REPO}/v2/${IMAGE}/manifests/${TAG}")"
-          LIST_DIGEST="$(echo "$HDRS" | tr -d '\r' | grep -i '^Docker-Content-Digest:' | head -n1 | awk '{print $2}')"
-          LIST_DIGEST="${LIST_DIGEST%%$'\r'}"
-          if [ -n "$LIST_DIGEST" ]; then
-            add_cp_entry "${SRC_REPO}/v2/${IMAGE}/manifests/${LIST_DIGEST}" "${DST_REPO}/v2/${IMAGE}/manifests/"
-          fi
           echo "$M" | jq -r '.manifests[].digest' | while read -r pd; do
             [ -z "$pd" ] && continue
             PM="$(jf rt curl -H "Accept: ${ACCEPT_MAN}, ${ACCEPT_MAN_OCI}" "/api/docker/${SRC_REPO}/v2/${IMAGE}/manifests/${pd}")"
