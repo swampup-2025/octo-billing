@@ -98,3 +98,4 @@ Thumbs.db
 # Logs
 logs
 *.log
+.idea/
