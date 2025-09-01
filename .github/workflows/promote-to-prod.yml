@@ -43,9 +43,8 @@ jobs:
         env:
           JF_URL: ${{ env.JF_URL }}
         with:
-          version: 2.78.5
+          version: 2.78.8
           oidc-provider-name: ${{ env.OIDC_PROVIDER_NAME }}
-          custom-server-id: github-actions
 
       - name: Verify Provenance and Test Results
         run: |
