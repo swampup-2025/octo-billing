@@ -10,7 +10,6 @@ env:
   OIDC_PROVIDER_NAME: swampup-2025/octo-billing@github
   JF_URL: ${{ vars.JF_URL }}
   JF_REGISTRY: ${{ vars.JF_REGISTRY }}
-  JF_DOCKER_REPO: dev-docker-local
   IMAGE_NAME: octo-billing
   BUILD_NAME: octo-billing-build
 
@@ -29,11 +28,11 @@ jobs:
 
     - name: Install JFrog CLI
       id: setup-jfrog-cli
-      uses: jfrog/setup-jfrog-cli@v4.5.13
+      uses: jfrog/setup-jfrog-cli@v4.6.0
       env:
         JF_URL: ${{ env.JF_URL }}
       with:
-        version: 2.78.8
+        version: 2.78.9
         oidc-provider-name: ${{ env.OIDC_PROVIDER_NAME }}
       
     - name: Docker login
@@ -91,5 +90,4 @@ jobs:
         echo "- **Package**: ${pkgName}" >> $GITHUB_STEP_SUMMARY
         echo "- **Full Tag**: ${fullImgTag}" >> $GITHUB_STEP_SUMMARY
         echo "- **Registry**: ${{ env.JF_REGISTRY }}" >> $GITHUB_STEP_SUMMARY
-        echo "- **Repository**: ${{ env.JF_DOCKER_REPO }}" >> $GITHUB_STEP_SUMMARY
         echo "- **View**: [Open in JFrog]($pkgLink)" >> $GITHUB_STEP_SUMMARY
