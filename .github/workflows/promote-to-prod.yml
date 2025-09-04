@@ -39,11 +39,11 @@ jobs:
   
       - name: Install JFrog CLI
         id: setup-jfrog-cli
-        uses: jfrog/setup-jfrog-cli@v4.5.13
+        uses: jfrog/setup-jfrog-cli@v4.6.0
         env:
           JF_URL: ${{ env.JF_URL }}
         with:
-          version: 2.78.8
+          version: 2.78.9
           oidc-provider-name: ${{ env.OIDC_PROVIDER_NAME }}
 
       - name: Verify Provenance and Test Results
