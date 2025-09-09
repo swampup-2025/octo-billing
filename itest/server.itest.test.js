@@ -16,7 +16,6 @@ describe('Octo Billing integration (Docker + Testcontainers)', () => {
 
     container = await new GenericContainer(imageTag)
       .withExposedPorts(3000)
-      .withWaitStrategy(Wait.forListeningPorts().withStartupTimeout(120000))
       .start();
 
     const mappedPort = container.getMappedPort(3000);
